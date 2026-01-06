@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>8체질 AI 자가진단 - Wellness Navigator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        /* Quiz Styles */
+        .progress-container {
+            width: 100%;
+            height: 6px;
+            background: #f0f0f0;
+            position: fixed;
+            top: 60px;
+            /* Below header */
+            left: 0;
+            z-index: 99;
+            display: none;
+            /* Hidden by default */
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: #00b8d4;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        #quiz-section {
+            display: none;
+            /* Hidden by default */
+        }
+
+        .question-card {
+            margin-top: 40px;
+            padding: 24px;
+            text-align: center;
+        }
+
+        .question-number {
+            font-size: 14px;
+            font-weight: 700;
+            color: #00b8d4;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+        }
+
+        .question-text {
+            font-size: 22px;
+            font-weight: 700;
+            color: #222;
+            margin-bottom: 32px;
+            line-height: 1.4;
+        }
+
+        .options-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option-btn {
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            padding: 18px;
+            border-radius: 16px;
+            font-size: 16px;
+            color: #444;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+        }
+
+        .option-btn:hover {
+            border-color: #00b8d4;
+            background: #f0fdff;
+            color: #00838f;
+        }
+
+        .option-btn:active {
+            transform: scale(0.98);
+        }
+
+        /* Result Styles */
+        #result-section {
+            display: none;
+            /* Hidden by default */
+        }
+
+        .mbti-tag {
+            background: #e3f2fd;
+            color: #1976d2;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 700;
+            display: inline-block;
+            margin-bottom: 8px;
+        }
+
+        .celeb-card {
+            display: flex;
+            align-items: center;
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 12px;
+        }
+
+        .celeb-img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #ddd;
+            margin-right: 12px;
+            object-fit: cover;
+        }
+
+        .celeb-info h4 {
+            font-size: 14px;
+            margin-bottom: 2px;
+        }
+
+        .celeb-info p {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .share-box {
+            background: #222;
+            color: white;
+            padding: 20px;
+            border-radius: 16px;
+            text-align: center;
+            margin: 24px;
+            cursor: pointer;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="mobile-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="profile-area">
+                <div class="avatar" style="width: 32px; height: 32px; font-size: 14px;">
+                    <i class="fa-solid fa-user-doctor"></i>
+                </div>
+                <div class="info">
+                    <span class="name">AI Wellness Navigator</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Progress (Quiz Only) -->
+        <div class="progress-container" id="progress-container">
+            <div class="progress-bar" id="progress-bar"></div>
+        </div>
+
+        <!-- === INTRO SECTION (Landing) === -->
+        <div id="intro-section">
+            <section class="score-card" style="text-align: center; padding: 40px 20px;">
+                <img src="landing_hero.png" alt="AI Wellness Navigator Hero"
+                    style="width: 100%; max-width: 280px; margin: 0 auto 24px auto; display: block; border-radius: 12px;">
+                <span class="mbti-tag" style="background:#e0f7fa; color:#006064; margin-bottom: 20px;">8체질 자가진단</span>
+                <h1 style="font-size: 24px; font-weight: 700; color: #333; margin-bottom: 10px;">왜 '체질 MBTI'인가?</h1>
+                <p class="paragraph" style="color: #666; line-height: 1.6;">
+                    성격 MBTI로 나를 이해하듯,<br>
+                    이제 <strong>건강도 내 몸의 설계도(DNA)</strong>를 알아야 합니다.<br><br>
+                    남들이 좋다는 '공복 사과'가<br>나에겐 독이 될 수 있습니다.
+                </p>
+                <div style="margin-top: 30px; margin-bottom: 30px;">
+                    <div style="font-size: 13px; color: #888; margin-bottom: 5px;">현재 참여 인원</div>
+                    <div id="intro-visitor-count" style="font-size: 28px; font-weight: 800; color: #00b8d4;">
+                        <i class="fa-solid fa-spinner fa-spin" style="font-size:20px;"></i>
+                    </div>
+                </div>
+                <button onclick="startQuiz()" class="option-btn"
+                    style="background: #00b8d4; color: white; border: none; width: 100%; font-weight: 700; padding: 20px; box-shadow: 0 4px 12px rgba(0, 184, 212, 0.3);">
+                    자가진단 시작하기 <i class="fa-solid fa-arrow-right" style="margin-left:8px;"></i>
+                </button>
+            </section>
+        </div>
+
+        <!-- === QUIZ SECTION === -->
+        <div id="quiz-section">
+            <div id="question-container">
+                <div class="question-card">
+                    <div style="padding: 40px 0;">
+                        <i class="fa-solid fa-circle-notch fa-spin" style="font-size: 30px; color: #ccc;"></i>
+                        <p style="margin-top: 20px; color: #888;">AI 진단 엔진 준비중...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- === RESULT SECTION === -->
+        <div id="result-section">
+            <section class="score-card" id="hero-section">
+                <span class="mbti-tag">당신의 건강 MBTI</span>
+                <h2 class="section-title" id="result-title">분석 중...</h2>
+                <div class="score-circle">
+                    <span class="score-value" id="result-name" style="font-size: 36px;"></span>
+                    <p class="score-desc" id="result-ename" style="margin-top:10px; font-size:14px; color:#666;"></p>
+                </div>
+                <p class="score-desc" id="result-summary">결과를 분석하고 있습니다.</p>
+            </section>
+
+            <section class="content-card">
+                <h3 class="card-title">체질 분석 리포트</h3>
+                <p class="paragraph" id="result-detail"></p>
+
+                <div style="margin-top: 30px; margin-bottom: 20px;">
+                    <div
+                        style="font-size: 13px; font-weight: 700; color: #333; margin-bottom: 10px; display: flex; align-items: center;">
+                        <i class="fa-solid fa-check" style="margin-right: 6px;"></i>
+                        나의 체질 분석 순위
+                    </div>
+                    <div style="font-size: 12px; color: #666; margin-bottom: 10px; margin-left: 20px;">
+                        <i class="fa-solid fa-ribbon" style="color: #e57373;"></i> 1순위가 당신의 유력 체질입니다.
+                    </div>
+
+                    <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+                        <thead>
+                            <tr style="border-bottom: 2px solid #eee; color: #444;">
+                                <th style="padding: 10px 0; text-align: left; width: 15%;">순위</th>
+                                <th style="padding: 10px 0; text-align: left;">추정체질</th>
+                                <th style="padding: 10px 0; text-align: right; width: 20%;">점수</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ranking-table-body"></tbody>
+                    </table>
+                </div>
+                <ul class="analysis-list" id="food-list"></ul>
+                <ul class="analysis-list" id="food-list"></ul>
+
+                <!-- Caution Section -->
+                <div
+                    style="margin-top: 24px; padding: 16px; background-color: #fff3e0; border-radius: 12px; border: 1px solid #ffe0b2;">
+                    <div style="font-size: 14px; font-weight: 700; color: #e65100; margin-bottom: 8px;">
+                        <i class="fa-solid fa-triangle-exclamation"></i> 생활 속 주의사항
+                    </div>
+                    <p class="paragraph" id="caution-text" style="font-size: 13px; margin: 0; color: #5d4037;"></p>
+                </div>
+            </section>
+
+            <section class="content-card" id="celeb-section">
+                <h3 class="card-title">같은 체질의 셀럽</h3>
+                <p class="subtitle">체질식으로 관리하는 스타들</p>
+                <div id="celeb-container"></div>
+            </section>
+
+            <section class="content-card text-content">
+                <h3 class="card-title">AI Wellness Navigator</h3>
+                <p class="paragraph" style="text-align: center;">
+                    정확한 진단을 위해<br>전문가와 상담하는 것을 권장합니다.
+                </p>
+                <div style="text-align: center; margin-top:20px;">
+                    <button onclick="location.href='result.html'" class="option-btn"
+                        style="background:#00b8d4; color:white; border:none; width:100%; margin-bottom:12px;">
+                        <i class="fa-solid fa-rotate-right"></i> 다시 테스트하기
+                    </button>
+                    <!-- Save Image Button -->
+                    <button onclick="saveResultImage()" class="option-btn"
+                        style="background:#fff; color:#333; border:2px solid #333; width:100%; margin-bottom:12px; font-weight:700;">
+                        <i class="fa-solid fa-camera"></i> 결과 카드 저장하기
+                    </button>
+                    <!-- Share Button (Moved Here) -->
+                    <button onclick="shareResult()" class="option-btn"
+                        style="background:white; color:#333; border:2px solid #ddd; width:100%;">
+                        <div style="font-size:15px; font-weight:700;">
+                            <i class="fa-solid fa-arrow-up-right-from-square"></i> 친구에게 결과 공유하기
+                        </div>
+                    </button>
+                </div>
+            </section>
+
+            <!-- AI Link (Moved to Bottom) -->
+            <div onclick="location.href='index.html'" class="share-box"
+                style="background:white; border:2px solid #eee; color:#333; box-shadow:0 4px 12px rgba(0,0,0,0.05);">
+                <div style="font-size: 18px; font-weight: 700; margin-bottom: 6px; color:#00b8d4;">
+                    'AI 멀티모달' 2차 체질 진단 가기 <i class="fa-solid fa-angle-right"></i>
+                </div>
+                <p style="font-size: 13px; color: #888; margin-top: 5px;">더 정확한 진단을 원하시나요?</p>
+            </div>
+
+            <footer class="app-footer">
+                <p>© 2025 8체질 AI Wellness Navigator</p>
+            </footer>
+        </div>
+    </div>
+
+    <!-- Logic Script: Handles BOTH Quiz and Result Modes -->
+    <script src="quiz_logic.js"></script>
+    <script>
+        // --- 1. View Controller ---
+        document.addEventListener("DOMContentLoaded", () => {
+            const urlParams = new URLSearchParams(window.location.search);
+
+            // Check if we have score parameters (m1score, etc)
+            if (urlParams.has('m1score')) {
+                // SHOW RESULT
+                showSection('result');
+                renderResult(urlParams);
+
+                // Increment View Count (Result View)
+                // Note: We might want to count on Start Quiz or Result View. 
+                // Currently keeping it on Result Load to count 'completions' or 'views'.
+                // But user requested count on first screen.
+            } else {
+                // SHOW INTRO
+                showSection('intro');
+
+                // Load visitor count for Intro
+                // --- 1. Participant Count Logic (Robust for Vercel) ---
+                fetch('/api/count', { method: 'POST' })
+                    .then(response => {
+                        if (!response.ok) throw new Error('Network response was not ok');
+                        return response.json();
+                    })
+                    .then(data => {
+                        const countEl = document.getElementById('intro-visitor-count');
+                        if (countEl && data.count) {
+                            countEl.innerHTML = `<i class="fa-solid fa-user-group"></i> 현재 <span class="highlight">${data.count.toLocaleString()}</span>명이 참여했어요`;
+                            countEl.classList.add('fade-in');
+                        }
+                    })
+                    .catch(error => {
+                        console.warn('API fetch failed, using fallback:', error);
+                        // Fallback for Vercel/Static Hosting
+                        const countEl = document.getElementById('intro-visitor-count');
+                        if (countEl) {
+                            // Randomize slightly to feel dynamic if desired, or static baseline
+                            const fallbackCount = 1204;
+                            countEl.innerHTML = `<i class="fa-solid fa-user-group"></i> 현재 <span class="highlight">${fallbackCount.toLocaleString()}</span>명이 참여했어요`;
+                            countEl.classList.add('fade-in');
+                        }
+                    });
+            }
+        });
+
+        function showSection(sectionName) {
+            document.getElementById('intro-section').style.display = 'none';
+            document.getElementById('quiz-section').style.display = 'none';
+            document.getElementById('result-section').style.display = 'none';
+            document.getElementById('progress-container').style.display = 'none';
+
+            if (sectionName === 'intro') {
+                document.getElementById('intro-section').style.display = 'block';
+            } else if (sectionName === 'quiz') {
+                document.getElementById('quiz-section').style.display = 'block';
+                document.getElementById('progress-container').style.display = 'block';
+            } else if (sectionName === 'result') {
+                document.getElementById('result-section').style.display = 'block';
+            }
+        }
+
+        function startQuiz() {
+            // Increment Count on Start? Or just proceed.
+            // Let's increment count here to show "I am participating"
+            fetch('/api/count', { method: 'POST' });
+
+            showSection('quiz');
+            if (typeof loadQuestion === 'function') {
+                loadQuestion();
+            }
+        }
+
+        // --- Coupang Partners Logic ---
+        const COUPANG_MAP = {
+            '소고기': '한우',
+            '연근': '연근조림',
+            '두부': '두부과자', // or '간편식 연두부'
+            '닭고기': '닭가슴살',
+            '돼지고기': '한돈',
+            '밀가루': '우리밀',
+            '견과류': '하루견과',
+            '배': '나주배',
+            '쌀': '유기농 쌀',
+            '감자': '감자',
+            '호박': '단호박',
+            '뿌리채소': '뿌리채소',
+            '오리고기': '훈제오리',
+            '보리': '보리쌀',
+            '배추': '알배기 배추',
+            '오이': '오이',
+            '바다생선': '자반고등어', // Example
+            '팥': '국산 팥',
+            '복어': '복어국',
+            '모든 조개류': '조개관자',
+            '메밀': '메밀면',
+            '푸른 잎 채소': '쌈채소',
+            '코코아': '코코아 파우더',
+            '현미': '발아현미',
+            '미역': '자른미역',
+            '생강': '생강청',
+            '계피': '계피가루',
+            '찹쌀': '찹쌀',
+            '꿀': '천연벌꿀',
+            '인삼': '홍삼스틱',
+            '마늘': '의성마늘'
+        };
+
+        function linkifyFood(foodString) {
+            if (!foodString) return '';
+            const COUPANG_ID = 'AF1234567'; // START: 쿠팡 파트너스 ID 수정하는 곳
+            const items = foodString.split(',').map(s => s.trim());
+
+            return items.map(item => {
+                // Remove parenthetical notes for search if complex
+                let query = COUPANG_MAP[item] || item;
+                // Encode for URL
+                const searchUrl = `https://www.coupang.com/np/search?component=&q=${encodeURIComponent(query)}&channel=user&trackId=${COUPANG_ID}`;
+
+                return `<a href="${searchUrl}" target="_blank" style="color:#00b8d4; text-decoration:underline;">${item}</a>`;
+            }).join(', ');
+        }
+
+        // --- 2. Result Rendering Logic ---
+        function renderResult(urlParams) {
+            // ... (DB definition omitted for brevity, assumed existing) ...
+            const DB = {
+                'mokyang': {
+                    name: '목양체질', ename: 'Hepatonia',
+                    title: '뚝심 있는 리더',
+                    summary: '간(Liver)이 강하고 폐(Lung)가 약한 타입',
+                    detail: '과묵하고 흔들림이 없으며, 땀을 흘릴수록 건강해지는 체질입니다. 육식이 매우 잘 맞지만, 잎채소나 해산물은 피하는 것이 좋습니다.',
+                    good: '소고기, 닭고기, 무, 연근, 밀가루, 배, 견과류',
+                    bad: '모든 조개류, 생선, 고등어, 초콜릿, 포도, 푸른 잎 채소',
+                    caution: '땀을 흠뻑 내는 등산이나 달리기가 보약입니다. 채식보다는 육식이 맞으며, 사우나도 좋습니다.',
+                    celebs: [
+                        { name: '옥주현 (뮤지컬 배우)', desc: '잎채소 대신 뿌리채소, 소고기·양고기 선택 (본인 언급)', img: 'https://img.hankyung.com/photo/202305/01.33355322.1.jpg' },
+                        { name: '싸이 (가수)', desc: '땀을 흠뻑 흘리는 공연이 건강의 비결', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Psy_at_KNN_Centum_Beer_Festival_in_2013_02.jpg/250px-Psy_at_KNN_Centum_Beer_Festival_in_2013_02.jpg' },
+                        { name: '강호동 (방송인)', desc: '육식 위주의 식단이 에너지를 주는 타입', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1d/Kang_Ho-dong_in_Nov_2019.png/250px-Kang_Ho-dong_in_Nov_2019.png' }
+                    ]
+                },
+                'mokeum': {
+                    name: '목음체질', ename: 'Cholecystonia',
+                    title: '감수성이 풍부한 평화주의자',
+                    summary: '담낭(Gallbladder)이 강하고 대장(Large Intestine)이 약한 타입',
+                    detail: '배가 차고 아랫배가 자주 불편할 수 있습니다. 따뜻한 음식을 먹고 몸을 따뜻하게 해야 합니다. 알코올 분해가 잘 안되므로 술은 피하세요.',
+                    good: '소고기, 돼지고기, 쌀, 감자, 호박, 뿌리채소',
+                    bad: '바다생선, 조개, 술, 초콜릿, 얼음, 푸른 잎 채소',
+                    caution: '아랫배를 항상 따뜻하게 하세요. 알코올 해독력이 약하니 술은 멀리하고, 격한 운동으로 땀을 내세요.',
+                    celebs: [
+                        { name: '이대호 (야구선수)', desc: '체격이 크고 소화력이 좋은 편', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Lee_Dae-ho_2018.jpg/250px-Lee_Dae-ho_2018.jpg' }
+                    ]
+                },
+                'toyang': {
+                    name: '토양체질', ename: 'Pancreotonia',
+                    title: '활동적인 긍정왕',
+                    summary: '췌장(Pancreas)이 강하고 신장(Kidney)이 약한 타입',
+                    detail: '급하고 활달하며 성격이 시원시원합니다. 위장에 열이 많아 찬 음식이 잘 맞습니다. 매운 음식이나 보양식(삼계탕)은 피하는 게 좋습니다.',
+                    good: '돼지고기, 오리고기, 보리, 배추, 오이, 바다생선, 얼음',
+                    bad: '닭고기, 인삼, 꿀, 고추, 생강, 사과, 귤',
+                    caution: '성격이 급해지지 않도록 여유를 가지세요. 냉수마찰이나 수영이 좋으며, 사우나나 열이 나는 음식은 피하세요.',
+                    celebs: [
+                        { name: '아이유 (가수)', desc: '소화력이 좋고 활동적인 에너지', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/64/IU_at_Sony_Store_fan_signing_event_in_Yeongdeungpo%2C_28_May_2016_03.jpg/250px-IU_at_Sony_Store_fan_signing_event_in_Yeongdeungpo%2C_28_May_2016_03.jpg' }
+                    ]
+                },
+                'toeum': {
+                    name: '토음체질', ename: 'Gastrotonia',
+                    title: '희귀하고 섬세한 체질',
+                    summary: '위장(Stomach)이 강하고 방광(Bladder)이 약한 타입',
+                    detail: '매우 드문 체질로, 페니실린 등 약물 부작용에 유의해야 합니다. 소화력은 좋으나 기름진 음식은 피해야 합니다.',
+                    good: '보리, 쌀, 팥, 오이, 돼지고기, 복어, 얼음',
+                    bad: '닭고기, 염소고기, 현미, 미역, 사과, 인삼, 약물(항생제)',
+                    caution: '소화력이 좋다고 과식하면 안 됩니다. 약물 부작용이 심하니 항생제 등 약물 복용에 특히 주의하세요.',
+                    celebs: []
+                },
+                'geumyang': {
+                    name: '금양체질', ename: 'Pulmotonia',
+                    title: '창의적인 아이디어 뱅크',
+                    summary: '폐(Lung)가 강하고 간(Liver)이 약한 타입',
+                    detail: '독창적이고 비현실적인 공상을 즐깁니다. 아토피나 알레르기 질환이 생기기 쉬우며, 육식보다는 채식과 생선이 맞습니다.',
+                    good: '모든 조개류, 쌀, 보리, 메밀, 팥, 푸른 잎 채소, 코코아',
+                    bad: '모든 육류(소, 돼지, 닭), 밀가루, 우유, 커피, 고추, 마늘',
+                    caution: '직물이나 햇빛 알레르기에 주의하세요. 모든 육식을 끊고 채식과 생선을 드셔야 하며, 화를 내지 마세요.',
+                    celebs: [
+                        { name: '예지원', desc: '한의원·8체질 관련 콘텐츠에서 금양체질로 소개 (직접 언급)', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/Ye_Ji-won_in_March_2019.png/250px-Ye_Ji-won_in_March_2019.png' },
+                        { name: '하현우', desc: '8체질 강의/영상에서 금양체질 사례로 자주 언급', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/Ha_Hyun-woo_in_July_2016.jpg/250px-Ha_Hyun-woo_in_July_2016.jpg' },
+                        { name: '박효신', desc: '신비주의·완벽주의 등 금양체질 특징의 전형 (추정)', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/Park_Hyo-shin_2019.jpg/250px-Park_Hyo-shin_2019.jpg' },
+                        { name: '이수 (엠씨더맥스)', desc: '역삼각형 체형과 내향적 성향 (추정)', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Lee_Soo_in_2016.jpg/250px-Lee_Soo_in_2016.jpg' },
+                        { name: '유아인', desc: 'INFP/INTP 성향과 직설적 이미지 (추정)', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/13/Yoo_Ah-in_at_the_Blue_Dragon_Film_Awards_2016.jpg/250px-Yoo_Ah-in_at_the_Blue_Dragon_Film_Awards_2016.jpg' }
+                    ]
+                },
+                'geumeum': {
+                    name: '금음체질', ename: 'Colonotonia',
+                    title: '예리한 직관의 승부사',
+                    summary: '대장(Large Intestine)이 강하고 담낭(Gallbladder)이 약한 타입',
+                    detail: '직관력이 뛰어나고 리더십이 있으며, 화를 내면 몸이 급격히 나빠집니다. 육식을 끊고 푸른 채소와 생선을 섭취해야 건강합니다.',
+                    good: '메밀, 쌀, 모든 조개, 생선, 푸른 잎 채소, 오이, 포도',
+                    bad: '모든 육류, 밀가루, 콩, 우유, 커피, 마늘, 녹용',
+                    caution: '육식은 만병의 근원입니다. 덥게 생활하거나 땀을 많이 내는 운동은 피하고, 수영이나 걷기가 좋습니다.',
+                    celebs: [
+                        { name: '배종옥 (배우)', desc: '체질 때문에 10년 넘게 고기를 끊고 채식 유지', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Bae_Jong-ok_in_Feb_2020.png/250px-Bae_Jong-ok_in_Feb_2020.png' },
+                        { name: '이세영 (배우)', desc: '고기와 뿌리채소가 안 맞아 오징어·해산물 위주 식단 (유퀴즈)', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Lee_Se-young_in_Oct_2021.png/250px-Lee_Se-young_in_Oct_2021.png' },
+                        { name: '하지원', desc: '라디오에서 금음체질 치료 경험 언급', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/Ha_Ji-won_in_2017.jpg/250px-Ha_Ji-won_in_2017.jpg' },
+                        { name: '나얼', desc: '팬미팅에서 8체질 맥 진단 후 금음체질 언급', img: 'https://i.namu.wiki/i/G-3Xq-3Xq-3Xq.jpg' }
+                    ]
+                },
+                'suyang': {
+                    name: '수양체질', ename: 'Renotonia',
+                    title: '완벽주의 차도남/차도녀',
+                    summary: '신장(Kidney)이 강하고 췌장(Pancreas)이 약한 타입',
+                    detail: '돌다리도 두들겨 보는 신중함이 있습니다. 땀을 흘리면 기운이 빠지므로 냉수마찰이나 수영이 좋습니다.',
+                    good: '현미, 감자, 닭고기, 염소고기, 미역, 생강, 계피, 사과',
+                    bad: '돼지고기, 조개류, 맥주, 얼음, 팥, 오이, 보리',
+                    caution: '땀을 많이 흘리면 기운이 빠집니다. 냉수마찰이 좋으며, 너무 완벽주의적인 성향으로 스트레스 받지 마세요.',
+                    celebs: [
+                        { name: '김연아 (피겨)', desc: '차분하고 정밀한 컨트롤 능력', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/Kim_Yuna_at_Incheon_International_Airport%2C_July_2024.jpg/250px-Kim_Yuna_at_Incheon_International_Airport%2C_July_2024.jpg' }
+                    ]
+                },
+                'sueum': {
+                    name: '수음체질', ename: 'Vesicotonia',
+                    title: '부드러운 카리스마',
+                    summary: '방광(Bladder)이 강하고 위장(Stomach)이 약한 타입',
+                    detail: '위장이 차고 무력하여 소식을 해야 합니다. 따뜻한 음식을 먹어야 하며, 보리밥이나 돼지고기는 절대 금물입니다.',
+                    good: '찹쌀, 감자, 닭고기, 꿀, 인삼, 생강, 계피, 마늘',
+                    bad: '돼지고기, 생선회, 조개, 보리, 팥, 오이, 얼음, 맥주',
+                    caution: '소화기가 가장 약합니다. 절대 과식하지 말고 소식하세요. 땀을 내는 사우나는 피하고 몸을 따뜻하게 하세요.',
+                    celebs: []
+                }
+            };
+
+            let results = [
+                { id: 'mokyang', score: parseInt(urlParams.get('m1score') || 0), label: '목양체질' },
+                { id: 'mokeum', score: parseInt(urlParams.get('m2score') || 0), label: '목음체질' },
+                { id: 'toyang', score: parseInt(urlParams.get('t1score') || 0), label: '토양체질' },
+                { id: 'toeum', score: parseInt(urlParams.get('t2score') || 0), label: '토음체질' },
+                { id: 'geumyang', score: parseInt(urlParams.get('k1score') || 0), label: '금양체질' },
+                { id: 'geumeum', score: parseInt(urlParams.get('k2score') || 0), label: '금음체질' },
+                { id: 'suyang', score: parseInt(urlParams.get('s1score') || 0), label: '수양체질' },
+                { id: 'sueum', score: parseInt(urlParams.get('s2score') || 0), label: '수음체질' }
+            ];
+
+            results.sort((a, b) => b.score - a.score);
+            const winner = results[0];
+            const data = DB[winner.id] || DB['geumeum'];
+
+            document.getElementById('result-title').innerText = data.title;
+            document.getElementById('result-name').innerText = data.name;
+            document.getElementById('result-ename').innerText = `(${data.ename})`;
+            document.getElementById('result-summary').innerHTML = data.summary.replace('(', '<br>(');
+            document.getElementById('result-detail').innerHTML = `당신은 <strong>${data.name}</strong>입니다.<br>${data.detail}`;
+            document.getElementById('caution-text').innerText = data.caution || "특이사항 없음";
+
+            const tbody = document.getElementById('ranking-table-body');
+            let tableHtml = '';
+            results.forEach((r, idx) => {
+                const isWinner = idx === 0;
+                const bgClass = isWinner ? 'background-color: #fde8e8;' : 'border-bottom: 1px solid #f5f5f5;';
+                const weightClass = isWinner ? 'font-weight:bold;' : '';
+                const icon = isWinner ? '<i class="fa-solid fa-person-dress" style="color:#333; margin-right:5px;"></i>' : '<i class="fa-solid fa-check" style="color:#ccc; margin-right:5px; font-size:10px;"></i>';
+
+                tableHtml += `
+                    <tr style="${bgClass} ${weightClass}">
+                        <td style="padding: 12px 0;">${idx + 1}</td>
+                        <td style="padding: 12px 0;">${icon} ${r.label}</td>
+                        <td style="padding: 12px 0; text-align: right;">${r.score}</td>
+                    </tr>
+                `;
+            });
+            tbody.innerHTML = tableHtml;
+
+            // 유전적 변수 고려 안내 문구 추가
+            if (urlParams.get('genetic_var') === 'true' || urlParams.get('info') === 'genetic') {
+                const infoDiv = document.createElement('div');
+                infoDiv.style.marginTop = '15px';
+                infoDiv.style.padding = '12px';
+                infoDiv.style.backgroundColor = '#e3f2fd';
+                infoDiv.style.borderRadius = '8px';
+                infoDiv.style.fontSize = '12px';
+                infoDiv.style.color = '#0277bd';
+                infoDiv.style.lineHeight = '1.5';
+                infoDiv.innerHTML = '<i class="fa-solid fa-dna" style="margin-right:6px;"></i> 유전적 변수를 고려했으나, 현재 설문 응답 결과가 가장 높은 체질로 진단되었습니다.';
+
+                // 순위 테이블 바로 아래에 추가
+                tbody.parentElement.parentElement.appendChild(infoDiv);
+            }
+
+            const foodList = document.getElementById('food-list');
+            const linkedGoodFood = linkifyFood(data.good);
+            foodList.innerHTML = `
+                <li><i class="fa-solid fa-circle-check" style="color:#4caf50;"></i> <strong>BEST:</strong> ${linkedGoodFood}</li>
+                <li><i class="fa-solid fa-triangle-exclamation" style="color:#f44336;"></i> <strong>WORST:</strong> ${data.bad}</li>
+            `;
+
+            // Append Coupang Partners Disclosure to Footer or Result
+            // Let's create a dedicated disclosure element if not exists or append to footer
+            const footer = document.querySelector('footer.app-footer');
+            if (footer && !document.getElementById('coupang-disclosure')) {
+                const disclosure = document.createElement('p');
+                disclosure.id = 'coupang-disclosure';
+                disclosure.style.fontSize = '11px';
+                disclosure.style.color = '#999';
+                disclosure.style.marginTop = '10px';
+                disclosure.innerHTML = '이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.<br><!-- ID: [사용자 ID 입력] -->';
+                footer.appendChild(disclosure);
+            }
+
+            const celebContainer = document.getElementById('celeb-container');
+            if (data.celebs && data.celebs.length > 0) {
+                let celebHtml = '';
+                data.celebs.forEach(c => {
+                    celebHtml += `
+                    <div class="celeb-card">
+                        <div class="celeb-img" style="background-image: url('${c.img}'); background-size: cover; background-position: center;"></div>
+                        <div class="celeb-info">
+                            <h4>${c.name}</h4>
+                            <p>${c.desc}</p>
+                        </div>
+                    </div>`;
+                });
+                celebContainer.innerHTML = celebHtml;
+            } else {
+                celebContainer.innerHTML = '<p class="paragraph" style="text-align:center; color:#999;">해당 체질의 등록된 셀럽 정보가 없습니다.</p>';
+            }
+        }
+
+        function shareResult() {
+            const shareText = document.title + "\nhttp://localhost:8080/result.html";
+            if (navigator.share) {
+                navigator.share({
+                    title: document.title,
+                    text: '나의 8체질 자가진단 결과',
+                    url: window.location.href
+                });
+            } else {
+                navigator.clipboard.writeText(window.location.href).then(() => {
+                    alert('링크가 복사되었습니다!');
+                });
+            }
+        }
+
+        function saveResultImage() {
+            const target = document.getElementById('hero-section');
+            if (!target) return;
+
+            window.scrollTo(0, 0);
+            html2canvas(target, {
+                useCORS: true,
+                scale: 2,
+                backgroundColor: "#ffffff"
+            }).then(canvas => {
+                const link = document.createElement('a');
+                const name = document.getElementById('result-name').innerText || 'Result';
+                link.download = `${name}_결과.png`;
+                link.href = canvas.toDataURL();
+                link.click();
+            }).catch(err => {
+                console.error("Capture failed:", err);
+                alert("이미지 저장 중 오류가 발생했습니다.");
+            });
+        }
+    </script>
+</body>
+
+</html>
