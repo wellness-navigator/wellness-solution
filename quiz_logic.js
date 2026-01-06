@@ -480,9 +480,7 @@ function finishTest(options = {}) {
     // --- Redirect Logic ---
     // If we are in V2 (result_v2.html) or have the finishTest hook, use it.
     // Otherwise default to result.html for V1.
-    if (typeof window.finishTest === 'function') {
-        window.finishTest({ geneticConsidered: false });
-    } else {
-        window.location.href = `result.html?${params.toString()}`;
-    }
+
+    window.location.href = `result.html?${params.toString()}`;
+
 }
