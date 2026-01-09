@@ -1323,12 +1323,13 @@
             }
 
             // V2 Button Style (Playful & Pop)
+            // V2 Button Style (Playful & Pop)
             recommendSection.innerHTML = `
                 <a href="${productLink}" target="_blank" onclick="${buttonAction}" 
                    style="display:block; width:100%; background:#FF5252; color:white; font-family:'Jua', sans-serif; font-size:18px; padding:18px; border-radius:18px; text-decoration:none; box-shadow:0 6px 0 #D32F2F; transform:translateY(0); transition:all 0.1s; position:relative;">
-                   <i class="fa-solid fa-gift" style="margin-right:8px;"></i> ${data.name} 맞춤 상품 보러가기
+                   <i class="fa-solid fa-gift" style="margin-right:8px;"></i> ${r[0].label} 맞춤 추천 상품 보러가기
                 </a>
-                <p style="font-size: 11px; color: #888; margin-top: 12px; line-height: 1.4;">
+                <p style="font-size: 10px; color: #ccc; margin-top: 12px; line-height: 1.4;">
                     이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.
                 </p>
             `;
