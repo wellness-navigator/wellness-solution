@@ -624,6 +624,7 @@
                 footer.appendChild(disclosure);
             }
 
+            // ... Existing logic ...
             const celebContainer = document.getElementById('celeb-container');
             if (data.celebs && data.celebs.length > 0) {
                 let celebHtml = '';
@@ -641,6 +642,36 @@
             } else {
                 celebContainer.innerHTML = '<p class="paragraph" style="text-align:center; color:#999;">해당 체질의 등록된 셀럽 정보가 없습니다.</p>';
             }
+
+            // --- Product Recommendation Logic ---
+            const targetConstitutions = ['mokyang', 'mokeum', 'suyang', 'sueum'];
+            const productLink = targetConstitutions.includes(winner.id)
+                ? 'https://link.coupang.com/a/doFZ3N'
+                : '#';
+
+            // Create Recommendation Section if not exists
+            let recommendSection = document.getElementById('recommend-section');
+            if (!recommendSection) {
+                recommendSection = document.createElement('div');
+                recommendSection.id = 'recommend-section';
+                recommendSection.style.marginTop = '30px';
+                recommendSection.style.textAlign = 'center';
+                // Insert after food list (ul with id food-list)
+                const foodListUl = document.getElementById('food-list');
+                foodListUl.parentNode.insertBefore(recommendSection, foodListUl.nextSibling);
+            }
+
+            const buttonAction = productLink === '#' ? "alert('준비중인 상품입니다.'); return false;" : "";
+
+            recommendSection.innerHTML = `
+                <a href="${productLink}" target="_blank" onclick="${buttonAction}" class="option-btn" 
+                   style="background: #ff5252; color: white; border: none; width: 100%; display: block; text-decoration: none; padding: 16px; margin-bottom: 8px;">
+                   <i class="fa-solid fa-gift" style="margin-right:8px;"></i> ${data.name} 맞춤 추천 상품 구매하기
+                </a>
+                <p style="font-size: 11px; color: #999; margin-top: 4px; line-height: 1.4;">
+                    이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.
+                </p>
+            `;
         }
 
         function shareResult() {
