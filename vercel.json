@@ -1,9 +1,34 @@
 {
   "cleanUrls": true,
+  "trailingSlash": false,
   "rewrites": [
     {
       "source": "/",
+      "has": [
+        {
+          "type": "host",
+          "value": "wellness-8lab.vercel.app"
+        }
+      ],
+      "destination": "/result.html"
+    },
+    {
+      "source": "/",
+      "has": [
+        {
+          "type": "host",
+          "value": "wellness-8mbti.vercel.app"
+        }
+      ],
+      "destination": "/result_v2.html"
+    },
+    {
+      "source": "/",
       "destination": "/index.html"
+    },
+    {
+      "source": "/api/count",
+      "destination": "/api/mock_count"
     }
   ]
 }
