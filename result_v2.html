@@ -1303,6 +1303,36 @@
                 rankingList.appendChild(infoDiv);
             }
 
+            // --- Product Recommendation Logic (New) ---
+            const targetConstitutions = ['mokyang', 'mokeum', 'suyang', 'sueum'];
+            const productLink = targetConstitutions.includes(winnerId)
+                ? 'https://link.coupang.com/a/doFZ3N'
+                : '#';
+
+            const buttonAction = productLink === '#' ? "alert('준비중인 상품입니다.'); return false;" : "";
+
+            // Check if recommendation section already exists to prevent duplicate
+            let recommendSection = document.getElementById('v2-recommend-section');
+            if (!recommendSection) {
+                recommendSection = document.createElement('div');
+                recommendSection.id = 'v2-recommend-section';
+                recommendSection.style.marginTop = '24px';
+                // Append to the Card (v2-result-card)
+                const card = document.getElementById('v2-result-card');
+                if (card) card.appendChild(recommendSection);
+            }
+
+            // V2 Button Style (Playful & Pop)
+            recommendSection.innerHTML = `
+                <a href="${productLink}" target="_blank" onclick="${buttonAction}" 
+                   style="display:block; width:100%; background:#FF5252; color:white; font-family:'Jua', sans-serif; font-size:18px; padding:18px; border-radius:18px; text-decoration:none; box-shadow:0 6px 0 #D32F2F; transform:translateY(0); transition:all 0.1s; position:relative;">
+                   <i class="fa-solid fa-gift" style="margin-right:8px;"></i> ${data.name} 맞춤 상품 보러가기
+                </a>
+                <p style="font-size: 11px; color: #888; margin-top: 12px; line-height: 1.4;">
+                    이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.
+                </p>
+            `;
+
             // Append Coupang Partners Disclosure to Footer
             // V2 has a centered text div at the bottom: id="result-section" -> div style="text-align:center..."
             // Let's create a dedicated element for legal text if not exists
